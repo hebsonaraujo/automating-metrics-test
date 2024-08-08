@@ -27,28 +27,27 @@ const indexSnippet = `
   scrapeComponent(component, URI);
 `;
 const dataSnippet = `
-export const URI = '';
+export const URI = 'MY_URL';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 export const PATH = resolve(dirname(fileURLToPath(new URL(import.meta.url))));
 
 /**
- * Configs referentes a porteira a ser testada.
- * Tipo de ativação: se é via click, bounce, ou espera alguns segundos
- * para que ela aparece na tela.
+ * Config's data refers to a paywall to be tested
+ * Activation type: click, modal,etc
  */
 export const TEMPLATE_PIANO_DATA = {
     activatedBy: {
         mode: 'click',
         selectorToActivate: '.btn'
     },
-    iframeId: 'iframe',
-    iframeWrapper: '.tp-iframe',
-    selectorsInsideIframe: ['.btn','.btn2','.back','.closed']
+    iframeId: 'iframe[id^="offer_"]',
+    iframeWrapper: '.tp-iframe-wrapper.tp-active',
+    selectorsInsideIframe: ['.assine-cinema_item__oTrkM.offer','.sign','.back','.closed']
 }
 /**
- * Configs para gerar relatórios
+ * Configs to reports
  */
 export const REPORTS_CONFIG = {
     viewByTerm: false,
@@ -67,49 +66,9 @@ export const TEST_CONFIG = {
     waitForNavigation: true,
     DEFAULT_TIME: 2500,
 }
-//GABARITO 
+
 export const METRICS_DATA = {
     filterFields: ['component','reference','pTemplate','action','paywallType'],
-    0: {
-        component: 'news-notice',
-        reference: 'cadastrar-email_jamil-chade',
-        action: 'subscribe-porteira'
-    },
-    1: {
-        component: "paywall-news-notice",
-        reference: "componente-visualizado",
-        pTemplate: "OTOD57QOWBUA",
-        action: "impressao",
-        paywallType: "newsletter-jamil-chade"
-    },
-    2: {
-        component: "paywall-news-notice",
-        reference: "botao-assinar",
-        pTemplate: "OTOD57QOWBUA",
-        paywallType: "newsletter-jamil-chade",
-        action: "https://conta.uol.com.br/login?t=cad-noticia-newsletter&env=checkout&dest=https%3A%2F%2Fcheckout.uol.com.br%2F%23%2Fnoticia-newsletter%2F0%3Fpromotion%3DPROMPKSC3893%26dest%3Dhttps%3A%2F%2Fwww.uol.com.br%2Fcarros%2F%3Fdoc%26component%3Dnews-notice%26variation%3Dnewsletter---jamil-chade-39-39"
-    },
-    3: {
-        component: "paywall-news-notice",
-        reference: "botao-assinante",
-        pTemplate: "OTOD57QOWBUA",
-        paywallType: "newsletter-jamil-chade",
-        action: "https://conta.uol.com.br/login?t=cad-noticia-newsletter&dest=https%3A%2F%2Fwww.uol.com.br%2Fcarros%2F%3Fdoc%26component%3Dnews-notice%26variation%3Dnewsletter---jamil-chade-39-39"
-    },
-    4: {
-        component: "paywall-news-notice",
-        reference: "link-voltar",
-        pTemplate: "OTOD57QOWBUA",
-        paywallType: "newsletter-jamil-chade",
-        action: "https://uol.com.br/"
-    },
-    5: {
-        component: "paywall-news-notice",
-        reference: "botao-fechar",
-        pTemplate: "OTOD57QOWBUA",
-        paywallType: "newsletter-jamil-chade",
-        action: "clique"
-    }
 }
 `
 const componentSnippet = `
@@ -143,20 +102,11 @@ async function iterateOverSelectors(page) {
     } = TEMPLATE_PIANO_DATA;
     for (let index = 0; index < selectorsInsideIframe.length; ++index) {
         let selector = selectorsInsideIframe[index];
-
         await ACTIVATE_LOAD_IFRAME[mode](page, DEFAULT_TIME, selectorToActivate, iframeWrapper);
-
-        await EVENTS.screenShot(page, PATH, 'porteira');
-
-        try {
-            //essa acao dispara um console
+        await EVENTS.screenShot(page, PATH, 'paywall');
+        try {           
             await ACTION_INSIDE_IFRAME[mode](page, iframeId, selector, DEFAULT_TIME);
-            // //apos o disparo preciso saber se o valor disparado é o que espero
-            // EVENTS.console(page,PATH,REPORTS_CONFIG,METRICS_DATA.filterFields);
-            
-
         } catch (error) {
-            console.error('Ocorreu um erro ao interagir com o frame:', error);
             await TIME.waitTime(page, DEFAULT_TIME);
         }
 
@@ -173,13 +123,10 @@ export async function component(page) {
 
     await iterateOverSelectors(page);
 
-    // EVENTS.savePdfFile(page,PATH,'myFilePDF','A4')
-
     if (TEST_CONFIG.waitForNavigation) {
         await page.waitForNavigation();
     }
 }
-
 `
 const dataComponentSnippet = componentSnippet
   .replace(/\n\s+/g, '\n')
