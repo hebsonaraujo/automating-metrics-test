@@ -44,4 +44,4 @@
 
 ## Example of Use:
 1. `cd scrapeComponents`
-2. `node news-notice`
+2. `node MyNewContextTest`
