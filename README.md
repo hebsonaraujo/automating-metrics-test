@@ -43,5 +43,6 @@
 3. Run the command `node folder`, where `folder` is the directory corresponding to the component/paywall you intend to test the metrics for.
 
 ## Example of Use:
-1. `cd scrapeComponents`
-2. `node MyNewContextTest`
+1. `node generate-component.js MyNewContext`
+2. `cd scrapeComponents`
+3. `node MyNewContext`
